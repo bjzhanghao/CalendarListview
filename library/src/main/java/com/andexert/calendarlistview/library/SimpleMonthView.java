@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
@@ -78,6 +79,11 @@ class SimpleMonthView extends View
     protected Paint mMonthTitleBGPaint;
     protected Paint mMonthTitlePaint;
     protected Paint mSelectedCirclePaint;
+
+    protected int[] mValueCircleColors; // Added by Hao
+    protected double[] mValueCircleThresholds; // Added by Hao
+    protected Paint[] mValueCirclePaints; // Added by Hao
+
     protected int mCurrentDayTextColor;
     protected int mMonthTextColor;
     protected int mDayTextColor;
@@ -162,6 +168,10 @@ class SimpleMonthView extends View
         return (dividend + (remainder > 0 ? 1 : 0));
 	}
 
+    /**
+     * Draw day of week texts (1~7)
+     * @param canvas
+     */
 	private void drawMonthDayLabels(Canvas canvas) {
         int y = MONTH_HEADER_SIZE - (MONTH_DAY_LABEL_TEXT_SIZE / 2);
         int dayWidthHalf = (mWidth - mPadding * 2) / (mNumDays * 2);
@@ -208,6 +218,10 @@ class SimpleMonthView extends View
         return ((mYear < time.year)) || (mYear == time.year && mMonth < time.month) || ( mMonth == time.month && monthDay < time.monthDay);
     }
 
+    /**
+     * Draw date texts (1~31)
+     * @param canvas
+     */
 	protected void drawMonthNums(Canvas canvas) {
 		int y = (mRowHeight + MINI_DAY_NUMBER_TEXT_SIZE) / 2 - DAY_SEPARATOR_WIDTH + MONTH_HEADER_SIZE;
 		int paddingDay = (mWidth - 2 * mPadding) / (2 * mNumDays);
@@ -225,6 +239,19 @@ class SimpleMonthView extends View
                 else
                     canvas.drawCircle(x, y - MINI_DAY_NUMBER_TEXT_SIZE / 3, DAY_SELECTED_CIRCLE_SIZE, mSelectedCirclePaint);
             }
+
+            //Test data population
+            if (day > 5 && day < 20) {
+                RectF rectF = new RectF(x - DAY_SELECTED_CIRCLE_SIZE, (y - MINI_DAY_NUMBER_TEXT_SIZE / 3) - DAY_SELECTED_CIRCLE_SIZE, x + DAY_SELECTED_CIRCLE_SIZE, (y - MINI_DAY_NUMBER_TEXT_SIZE / 3) + DAY_SELECTED_CIRCLE_SIZE);
+                double r = Math.random();
+                for (int i = 0; i < mValueCircleThresholds.length; i++) {
+                    if (r < mValueCircleThresholds[i]) {
+                        canvas.drawRoundRect(rectF, 10.0f, 10.0f, mValueCirclePaints[i]);
+                        break;
+                    }
+                }
+            }
+            
             if (mHasToday && (mToday == day)) {
                 mMonthNumPaint.setColor(mCurrentDayTextColor);
                 mMonthNumPaint.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
@@ -329,6 +356,20 @@ class SimpleMonthView extends View
         mSelectedCirclePaint.setTextAlign(Align.CENTER);
         mSelectedCirclePaint.setStyle(Style.FILL);
         mSelectedCirclePaint.setAlpha(SELECTED_CIRCLE_ALPHA);
+
+        mValueCircleColors = new int[]{Color.parseColor("#00ffcc"), Color.parseColor("#ffffcc"), Color.parseColor("#ffcccc")};
+        mValueCircleThresholds = new double[]{0.2, 0.7, 1};
+        mValueCirclePaints = new Paint[3];
+        
+        for(int i=0;i<mValueCirclePaints.length;i++){
+            mValueCirclePaints[i] = new Paint();
+            mValueCirclePaints[i].setFakeBoldText(true);
+            mValueCirclePaints[i].setAntiAlias(true);
+            mValueCirclePaints[i].setColor(mValueCircleColors[i]);
+            mValueCirclePaints[i].setTextAlign(Align.CENTER);
+            mValueCirclePaints[i].setStyle(Style.FILL);
+            mValueCirclePaints[i].setAlpha(SELECTED_CIRCLE_ALPHA);
+        }
 
         mMonthDayLabelPaint = new Paint();
         mMonthDayLabelPaint.setAntiAlias(true);

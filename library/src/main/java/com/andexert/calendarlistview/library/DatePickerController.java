@@ -30,4 +30,6 @@ public interface DatePickerController {
 
     public abstract void onDateRangeSelected(final SimpleMonthAdapter.SelectedDays<SimpleMonthAdapter.CalendarDay> selectedDays);
 
+//    public abstract DayData getDayData();
+
 }
