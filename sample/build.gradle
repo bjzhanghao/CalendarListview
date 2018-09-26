@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "com.andexert.sample"
         minSdkVersion 14
-        targetSdkVersion 21
+        targetSdkVersion 23
         versionCode 8
         versionName "1.2.3"
     }
